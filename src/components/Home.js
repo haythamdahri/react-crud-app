@@ -73,6 +73,14 @@ export default class Home extends React.Component {
 
     deletePersons = (event) => {
         const personId = parseInt(event.target.attributes["data-val"].value);
+        const API = "http://localhost:8080/api/persons/";
+        fetch(`${API}/${personId}`, {
+            method: 'DELETE'
+        }).then((response) => response.json()).then((response) => {
+            this.loadPersons(0, this.searchInput.current.value);
+        }).catch((err) => {
+            this.loadPersons(0, this.searchInput.current.value)
+        })
         this.setState({
             data: this.state.data.filter(person => person.id !== personId)
         });
