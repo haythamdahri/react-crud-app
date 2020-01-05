@@ -49,7 +49,6 @@ export default function Person(props) {
             setPerson(response.person);
         }).catch((err) => {
             alert("No error occurred!")
-            console.log(err);
             setEditMode(false);
         })
     }
