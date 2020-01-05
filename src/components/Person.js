@@ -10,7 +10,7 @@ export default function Person(props) {
 
     // Set document title
     document.title = "Person";
-    const [person, setPerson] = useState(new PersonModel(0, "", ""))
+    const [person, setPerson] = useState(new PersonModel(null, "", ""))
     const [editMode, setEditMode] = useState(false);
 
     // Path params
@@ -33,7 +33,7 @@ export default function Person(props) {
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
-        fetch(`${API}`, {
+        fetch(`${API}/${id}`, {
             method: 'PUT', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
             cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -46,7 +46,8 @@ export default function Person(props) {
             referrerPolicy: 'no-referrer', // no-referrer, *client
             body: JSON.stringify(person) // body data type must match "Content-Type" header
         }).then((response) => response.json()).then((response) => {
-            setPerson(response.person);
+            setPerson(response);
+            setEditMode(false);
         }).catch((err) => {
             alert("No error occurred!")
             setEditMode(false);
@@ -91,7 +92,7 @@ export default function Person(props) {
                             <li className="list-group-item">Email: {person.email}</li>
                         </ul>
                     </div>
-                    <button className="btn btn-warning btn-block mt-4" onClick={() => { setEditMode(true) }} ><FontAwesomeIcon icon={faUserEdit} /> Edit person</button>
+                    <button className="btn btn-warning btn-block mt-4" disabled={person.id == null} onClick={() => { setEditMode(true) }} ><FontAwesomeIcon icon={faUserEdit} /> Edit person</button>
                     <Link to="/"><button className="btn btn-secondary btn-sm mt-4"><FontAwesomeIcon icon={faHome} />Back Home</button></Link>
                 </div>
             </div>
