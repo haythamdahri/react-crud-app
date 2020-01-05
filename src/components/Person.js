@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useParams, useLocation, Redirect } from 'react-router-dom';
 import PersonModel from '../models/PersonModel';
 import queryString from 'query-string';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,22 +8,50 @@ import { faUserEdit, faSave, faHome } from '@fortawesome/free-solid-svg-icons'
 
 export default function Person(props) {
 
-    // Path params
-    const { id } = props.match.params;
-    // Query params
-    const values = queryString.parse(props.location.search)
-    const name = values.name;
-    const email = values.email;
-
     // Set document title
     document.title = "Person";
-    const [person, setPerson] = useState(new PersonModel(id, name, email))
+    const [person, setPerson] = useState(new PersonModel(0, "", ""))
     const [editMode, setEditMode] = useState(false);
+
+    // Path params
+    const { id } = props.match.params;
+    const API = "http://localhost:8080/api/persons";
+
+
+    useEffect(() => {
+        fetch(`${API}/${id}`).then((response) => response.json()).then((response) => {
+            const tempPerson = new PersonModel(id, response.name, response.email);
+            console.log(tempPerson);
+            setPerson(tempPerson);
+        }).catch((err) => {
+            alert("No user has been found!")
+            props.history.push("/");
+        })
+    }, []);
+
     let renderedHTML;
 
     const handleFormSubmit = (event) => {
         event.preventDefault();
-        setEditMode(false);
+        fetch(`${API}`, {
+            method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+            body: JSON.stringify(person) // body data type must match "Content-Type" header
+        }).then((response) => response.json()).then((response) => {
+            setPerson(response.person);
+        }).catch((err) => {
+            alert("No error occurred!")
+            console.log(err);
+            setEditMode(false);
+        })
     }
 
     if (editMode) {

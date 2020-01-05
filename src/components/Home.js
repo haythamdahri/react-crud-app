@@ -25,13 +25,26 @@ export default class Home extends React.Component {
     }
 
     async loadPersons(page) {
-        const API = "http://localhost:8080/api/persons";
-        const response = await (await fetch(`${API}?size=10&page=${page}`)).json();
+        // Set loading  state
         this.setState({
-            data: response._embedded.persons,
-            loading: false,
-            page: response.page
-        });
+            loading: true,
+            data: []
+        })
+        const API = "http://localhost:8080/api/persons";
+        fetch(`${API}?size=10&page=${page}`).then((response) => response.json()).then((response) => {
+            this.setState({
+                data: response._embedded.persons,
+                loading: false,
+                page: response.page
+            });
+        }).catch((err) => {
+            console.log(err);
+            this.setState({
+                data: null,
+                loading: false,
+                page: null
+            });
+        })
     }
 
     deletePersons = (event) => {
@@ -64,19 +77,19 @@ function Pagination(props) {
         return (
             <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-center">
-                    <li className="page-item">
+                    <li className={props.page.number === 0 ? 'page-item disabled' : 'page-item'}>
                         <button className="page-link" onClick={()=>props.loadPersons(props.page.number - 1)}>Previous</button>
                     </li>
                     {
                         pages.map((index) => {
                             return (
-                                <li className="page-item" key={index}>
+                                <li className={props.page.number === index ? 'page-item active' : 'page-item' } key={index}>
                                     <button className="page-link" onClick={()=>props.loadPersons(index)}>{index + 1}</button>
                                 </li>
                             );
                         })
                     }
-                    <li className="page-item">
+                    <li className={props.page.number === props.page.totalPages ? 'page-item disabled' : 'page-item'}>
                         <button className="page-link" onClick={(()=>props.loadPersons(props.page.number + 1))}>Next</button>
                     </li>
                 </ul>
@@ -109,7 +122,7 @@ function TableRow(props) {
                     <td>{person.name}</td>
                     <td>{person.email}</td>
                     <td>
-                        <Link to={'/persons/' + person.id + '?name=' + person.name + '&email=' + person.email}>
+                        <Link to={'/persons/' + person.id}>
                             <button className="btn btn-primary btn-sm btn-block">
                                 <FontAwesomeIcon icon={faUserEdit} /> Edit
                             </button>
@@ -123,7 +136,7 @@ function TableRow(props) {
                 </tr>
             )
         );
-    } else if (!props.loading && props.data != null && props.data.length == 0) {
+    } else if (!props.loading && props.data != null && props.data.length === 0) {
         tableHTML = (
             <tr align="center">
                 <td colSpan="5" className="alert alert-warning text-center font-weight-bold">
