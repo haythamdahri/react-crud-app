@@ -46,9 +46,9 @@ export default class Modals extends Component {
     render() {
         return (
             <div>
-                <Button color="primary" onClick={this.toggle}><FontAwesomeIcon icon={faUserPlus} /> Open</Button>
+                <Button color="primary" onClick={this.toggle}><FontAwesomeIcon icon={faUserPlus} /> Add user</Button>
                 <Modal size="lg" aria-labelledby="example-modal-sizes-title-lg" isOpen={this.state.modal} toggle={this.toggle}>
-                    <ModalHeader toggle={this.toggle}>Add a new user | </ModalHeader>
+                    <ModalHeader toggle={this.toggle}>Add a new user</ModalHeader>
                     <ModalBody>
                         <form onSubmit={this.handleFormSubmit} className="p-2">
                             <div className="form-group">
