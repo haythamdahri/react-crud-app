@@ -8,15 +8,15 @@ import { ToastContainer } from 'react-toastify';
 
 export default function Person(props) {
 
-    const successNotify = () => {
+    const successNotify = (message) => {
 
-        toast.success("Person has been saved successfully!", {
+        toast.success(message, {
             position: toast.POSITION.TOP_RIGHT
         });
     }
-    const failedNotify = () => {
+    const failedNotify = (message) => {
 
-        toast.error("An error occurred!", {
+        toast.error(message, {
             position: toast.POSITION.TOP_RIGHT
         });
     }
@@ -60,7 +60,7 @@ export default function Person(props) {
             }).then((response) => response.json()).then((response) => {
                 setPerson(response);
                 setEditMode(false);
-                successNotify();
+                successNotify(`${person.name} has been saved successfully!`);
             }).catch((err) => {
                 failedNotify();
                 setEditMode(false);

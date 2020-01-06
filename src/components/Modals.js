@@ -3,12 +3,8 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faWindowClose, faSave } from '@fortawesome/free-solid-svg-icons';
 import PersonModel from '../models/PersonModel';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 export default class Modals extends Component {
-    notifyA = () => toast.success('Person has been saved successfully!', {containerId: 'A'});
-
     constructor(props) {
         super(props);
         this.state = {
@@ -39,18 +35,17 @@ export default class Modals extends Component {
             referrerPolicy: 'no-referrer', // no-referrer, *client
             body: JSON.stringify(this.state.person) // body data type must match "Content-Type" header
         }).then((response) => response.json()).then((response) => {
-            this.notifyA();
+            this.props.successNotify(`${this.state.person.name} has been saved successfully!`);
             this.props.loadPersons(0, null);
             this.toggle();
         }).catch((err) => {
-            alert("An error occurred");
+            this.props.failedNotify("An error occurred, please try again later!");
         })
     }
 
     render() {
         return (
             <div>
-                <ToastContainer enableMultiContainer containerId={'A'} position={toast.POSITION.TOP_RIGHT} />
                 <Button color="primary" onClick={this.toggle}><FontAwesomeIcon icon={faUserPlus} /> Add user</Button>
                 <Modal size="lg" aria-labelledby="example-modal-sizes-title-lg" isOpen={this.state.modal} toggle={this.toggle}>
                     <ModalHeader toggle={this.toggle}>Add a new user</ModalHeader>

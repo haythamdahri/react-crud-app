@@ -3,9 +3,19 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserMinus, faUserEdit, faExclamation, faSearch, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import Modals from './Modals'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default class Home extends React.Component {
 
+    successNotify = (message) => {
+        toast.success(message);
+    }
+    failedNotify = (message) => {
+        toast.error(message, {
+            position: toast.POSITION.TOP_RIGHT
+        });
+    }
     constructor(props) {
         super(props);
         this.state = {
@@ -72,19 +82,21 @@ export default class Home extends React.Component {
 
     }
 
-    deletePersons = (event) => {
+    deletePersons = async (event) => {
         const personId = parseInt(event.target.attributes["data-val"].value);
         const API = "http://localhost:8080/api/persons/";
-        fetch(`${API}/${personId}`, {
+        const response = await fetch(`${API}/${personId}`, {
             method: 'DELETE'
-        }).then((response) => response.json()).then((response) => {
-            this.loadPersons(0, this.searchInput.current.value);
-        }).catch((err) => {
-            this.loadPersons(0, this.searchInput.current.value)
-        })
-        this.setState({
-            data: this.state.data.filter(person => person.id !== personId)
         });
+        if( response != null && response.status >= 200 && response.status < 300 ) {
+            this.successNotify("Person has been deleted successfully");
+            this.loadPersons(0, this.searchInput.current.value);
+            this.setState({
+                data: this.state.data.filter(person => person.id !== personId)
+            });
+        } else {
+            this.failedNotify("An error occurred, please retry again later!");
+        }
     }
 
     handleFormSubmit = (event) => {
@@ -95,6 +107,8 @@ export default class Home extends React.Component {
     render() {
         return (
             <div className="row mb-5">
+
+                <ToastContainer enableMultiContainer />
                 <div className="col-12">
                     <div className="col-12 mt-4">
                         <form className="form-inline mb-4" onSubmit={this.handleFormSubmit}>
@@ -104,7 +118,7 @@ export default class Home extends React.Component {
                                     <FontAwesomeIcon icon={faSearch} /> Search
                                 </button>
                             </div>
-                            <Modals loadPersons={this.loadPersons} />
+                            <Modals successNotify={this.successNotify} failedNotify={this.failedNotify} loadPersons={this.loadPersons} />
                         </form>
                         {/* Button trigger modal */}
                     </div>
