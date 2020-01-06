@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserMinus, faUserEdit, faExclamation, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faUserMinus, faUserEdit, faExclamation, faSearch, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import Modals from './Modals'
 
 export default class Home extends React.Component {
 
@@ -98,12 +99,14 @@ export default class Home extends React.Component {
                     <div className="col-12 mt-4">
                         <form className="form-inline mb-4" onSubmit={this.handleFormSubmit}>
                             <div className="form-row align-items-center">
-                                <input ref={this.searchInput} className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                                <button className="btn btn-outline-success my-2 my-sm-0" type="submit">
+                                <input ref={this.searchInput} className="form-control mr-sm-2" type="search" placeholder="Name ..." aria-label="Search" />
+                                <button className="btn btn-outline-success my-2 my-sm-0 mr-4 mb-4" type="submit">
                                     <FontAwesomeIcon icon={faSearch} /> Search
                                 </button>
                             </div>
+                            <Modals loadPersons={this.loadPersons} />
                         </form>
+                        {/* Button trigger modal */}
                     </div>
                     <TableRow data={this.state.data} deletePerson={this.deletePersons} loading={this.state.loading} />
                 </div>
@@ -118,11 +121,7 @@ export default class Home extends React.Component {
 function Pagination(props) {
     if (props.page != null) {
         let pages = [];
-        if (props.page.totalPages < 5) {
-            for (let i = 0; i < props.page.totalPages; i++) {
-                pages.push(i);
-            }
-        } else {
+        if (props.page.totalPages >= 5) {
             for (let i = 0; i < props.page.totalPages - (props.page.totalPages - 5); i++) {
                 pages.push(i);
             }
@@ -131,9 +130,15 @@ function Pagination(props) {
         return (
             <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-center">
-                    <li className={props.page.number === 0 ? 'page-item disabled' : 'page-item'}>
-                        <button className="page-link" onClick={() => props.loadPersons(props.page.number - 1, props.search.value)}>Previous</button>
-                    </li>
+                    {
+                        props.page.totalPages >= 5 ? (
+                            <li className={props.page.number === 0 ? 'page-item disabled' : 'page-item'}>
+                                <button className="page-link" onClick={() => props.loadPersons(props.page.number - 1, props.search.value)}>Previous</button>
+                            </li>
+                        ) : (
+                                <div></div>
+                            )
+                    }
                     {
                         pages.map((index) =>
                             <li className={props.page.number === index ? 'page-item active' : 'page-item'} key={index}>
@@ -141,9 +146,16 @@ function Pagination(props) {
                             </li>
                         )
                     }
-                    <li className={props.page.number === props.page.totalPages - 1 ? 'page-item disabled' : 'page-item'}>
-                        <button className="page-link" onClick={(() => props.loadPersons(props.page.number + 1, props.search.value))}>Next</button>
-                    </li>
+                    {
+                        props.page.totalPages >= 5 ? (
+                            <li className={props.page.number === props.page.totalPages - 1 ? 'page-item disabled' : 'page-item'}>
+                                <button className="page-link" onClick={(() => props.loadPersons(props.page.number + 1, props.search.value))}>Next</button>
+                            </li>
+                        ) : (
+                                <div></div>
+                            )
+                    }
+
                 </ul>
             </nav>
         )

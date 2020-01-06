@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useLocation, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PersonModel from '../models/PersonModel';
-import queryString from 'query-string';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserEdit, faSave, faHome } from '@fortawesome/free-solid-svg-icons'
 
@@ -24,7 +23,7 @@ export default function Person(props) {
             console.log(tempPerson);
             setPerson(tempPerson);
         }).catch((err) => {
-            alert("No user has been found!")
+            setPerson(null);
             props.history.push("/");
         })
     }, []);
