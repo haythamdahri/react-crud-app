@@ -4,4 +4,9 @@ export default class PersonModel {
         this.name = name;
         this.email = email;
     }
+
+    areFieldsNotEmpty() {
+        return this.name !== '' && this.email !== '';
+    }
+
 }

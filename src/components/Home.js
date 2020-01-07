@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserMinus, faUserEdit, faExclamation, faSearch, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faUserMinus, faUserEdit, faExclamation, faSearch } from '@fortawesome/free-solid-svg-icons'
 import Modals from './Modals'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -38,57 +38,42 @@ export default class Home extends React.Component {
     }
 
     async loadPersons(page, search = null) {
-        if ((search != null && search == "") || search == null) {
-            // Set loading  state
+        // Set loading  state
+        this.setState({
+            loading: true,
+            data: []
+        })
+        const API = "http://192.168.1.6:8080/api/persons";
+        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=10&page=${page}` : `${API}/search/by-name?name=${search}&size=10&page=${page}`;
+
+        fetch(API_URL).then((response) => response.json()).then((response) => {
             this.setState({
-                loading: true,
-                data: []
-            })
-            const API = "http://localhost:8080/api/persons";
-            fetch(`${API}?size=10&page=${page}`).then((response) => response.json()).then((response) => {
-                this.setState({
-                    data: response._embedded.persons,
-                    loading: false,
-                    page: response.page
-                });
-            }).catch((err) => {
-                this.setState({
-                    data: null,
-                    loading: false,
-                    page: null
-                });
-            })
-        } else {
-            // Set loading  state
+                data: response._embedded.persons,
+                loading: false,
+                page: response.page
+            });
+        }).catch((err) => {
             this.setState({
-                loading: true,
-                data: []
-            })
-            const API = "http://localhost:8080/api/persons/";
-            fetch(`${API}/search/by-name?name=${search}&size=10&page=${page}`).then((response) => response.json()).then((response) => {
-                this.setState({
-                    data: response._embedded.persons,
-                    loading: false,
-                    page: response.page
-                });
-            }).catch((err) => {
-                this.setState({
-                    data: null,
-                    loading: false,
-                    page: null
-                });
-            })
-        }
+                data: null,
+                loading: false,
+                page: null
+            });
+        })
 
     }
 
     deletePersons = async (event) => {
+        event.target.innerHTML = `
+            <div class="spinner-border spinner-border-sm" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>  Deleting ...
+        `;
         const personId = parseInt(event.target.attributes["data-val"].value);
-        const API = "http://localhost:8080/api/persons/";
+        const API = "http://192.168.1.6:8080/api/persons/";
         const response = await fetch(`${API}/${personId}`, {
             method: 'DELETE'
         });
-        if( response != null && response.status >= 200 && response.status < 300 ) {
+        if (response != null && response.status >= 200 && response.status < 300) {
             this.successNotify("Person has been deleted successfully");
             this.loadPersons(0, this.searchInput.current.value);
             this.setState({
@@ -96,6 +81,9 @@ export default class Home extends React.Component {
             });
         } else {
             this.failedNotify("An error occurred, please retry again later!");
+            event.target.innerHTML = `
+                <FontAwesomeIcon icon={faUserMinus} /> Delete
+            `
         }
     }
 
@@ -125,62 +113,56 @@ export default class Home extends React.Component {
                     <TableRow data={this.state.data} deletePerson={this.deletePersons} loading={this.state.loading} />
                 </div>
                 <div className="col-12">
-                    <Pagination page={this.state.page} loadPersons={this.loadPersons} search={this.searchInput.current} />
+                    {
+                        this.state.page != null ? <Pagination page={this.state.page} loadPersons={this.loadPersons} search={this.searchInput.current} /> : <div></div>
+                    }
                 </div>
             </div>
         )
     }
 }
 
-function Pagination(props) {
-    if (props.page != null) {
-        let pages = [];
-        if (props.page.totalPages >= 5) {
-            for (let i = 0; i < props.page.totalPages - (props.page.totalPages - 5); i++) {
-                pages.push(i);
-            }
+const Pagination = (props) => {
+    let pages = [];
+    if (props.page.totalPages >= 5) {
+        for (let i = 0; i < props.page.totalPages - (props.page.totalPages - 5); i++) {
+            pages.push(i);
         }
-
-        return (
-            <nav aria-label="Page navigation example">
-                <ul className="pagination justify-content-center">
-                    {
-                        props.page.totalPages >= 5 ? (
-                            <li className={props.page.number === 0 ? 'page-item disabled' : 'page-item'}>
-                                <button className="page-link" onClick={() => props.loadPersons(props.page.number - 1, props.search.value)}>Previous</button>
-                            </li>
-                        ) : (
-                                <div></div>
-                            )
-                    }
-                    {
-                        pages.map((index) =>
-                            <li className={props.page.number === index ? 'page-item active' : 'page-item'} key={index}>
-                                <button className="page-link" onClick={() => props.loadPersons(index, props.search.value)}>{index + 1}</button>
-                            </li>
-                        )
-                    }
-                    {
-                        props.page.totalPages >= 5 ? (
-                            <li className={props.page.number === props.page.totalPages - 1 ? 'page-item disabled' : 'page-item'}>
-                                <button className="page-link" onClick={(() => props.loadPersons(props.page.number + 1, props.search.value))}>Next</button>
-                            </li>
-                        ) : (
-                                <div></div>
-                            )
-                    }
-
-                </ul>
-            </nav>
-        )
-    } else {
-        return (
-            <div></div>
-        );
     }
+    return (
+        <nav aria-label="Page navigation example">
+            <ul className="pagination justify-content-center">
+                {
+                    props.page.totalPages >= 5 ? (
+                        <li className={props.page.number === 0 ? 'page-item disabled' : 'page-item'}>
+                            <button className="page-link" onClick={() => props.loadPersons(props.page.number - 1, props.search.value)}>Previous</button>
+                        </li>
+                    ) : (
+                            <div></div>
+                        )
+                }
+                {
+                    pages.map((index) =>
+                        <li className={props.page.number === index ? 'page-item active' : 'page-item'} key={index}>
+                            <button className="page-link" onClick={() => props.loadPersons(index, props.search.value)}>{index + 1}</button>
+                        </li>
+                    )
+                }
+                {
+                    props.page.totalPages >= 5 ? (
+                        <li className={props.page.number === props.page.totalPages - 1 ? 'page-item disabled' : 'page-item'}>
+                            <button className="page-link" onClick={(() => props.loadPersons(props.page.number + 1, props.search.value))}>Next</button>
+                        </li>
+                    ) : (
+                            <div></div>
+                        )
+                }
+            </ul>
+        </nav>
+    )
 }
 
-function TableRow(props) {
+const TableRow = (props) => {
     let tableHTML = "";
     if (props.loading) {
         tableHTML = (
@@ -241,7 +223,7 @@ function TableRow(props) {
                     <th scope="col" colSpan="2">Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody className="h-100 ">
                 {tableHTML}
             </tbody>
         </table>
