@@ -44,7 +44,7 @@ export default class Home extends React.Component {
             data: []
         })
         const API = "http://192.168.1.6:8080/api/persons";
-        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=10&page=${page}` : `${API}/search/by-name?name=${search}&size=10&page=${page}`;
+        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=10&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
 
         fetch(API_URL).then((response) => response.json()).then((response) => {
             this.setState({
@@ -95,23 +95,25 @@ export default class Home extends React.Component {
     render() {
         return (
             <div className="row mb-5">
-
-                <ToastContainer enableMultiContainer />
                 <div className="col-12">
-                    <div className="col-12 mt-4">
-                        <form className="form-inline mb-4" onSubmit={this.handleFormSubmit}>
-                            <div className="form-row align-items-center">
-                                <input ref={this.searchInput} className="form-control mr-sm-2" type="search" placeholder="Name ..." aria-label="Search" />
-                                <button className="btn btn-outline-success my-2 my-sm-0 mr-4 mb-4" type="submit">
-                                    <FontAwesomeIcon icon={faSearch} /> Search
-                                </button>
-                            </div>
-                            <Modals successNotify={this.successNotify} failedNotify={this.failedNotify} loadPersons={this.loadPersons} />
-                        </form>
-                        {/* Button trigger modal */}
-                    </div>
-                    <TableRow data={this.state.data} deletePerson={this.deletePersons} loading={this.state.loading} />
+                    <ToastContainer enableMultiContainer />
                 </div>
+                <div className="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-4">
+                    <form className="form-inline mb-4" onSubmit={this.handleFormSubmit}>
+                        <div className="form-row align-items-center">
+                            <input ref={this.searchInput} className="form-control mr-sm-2" type="search" placeholder="Name ..." aria-label="Search" />
+                            <button className="btn btn-outline-success my-2 my-sm-0 mr-4 mb-4" type="submit">
+                                <FontAwesomeIcon icon={faSearch} /> Search
+                                </button>
+                        </div>
+                    </form>
+                </div>
+                <div className="col-sm-12 col-md-6 col-lg-6 col-xl-6 mt-4">
+                    <Modals successNotify={this.successNotify} failedNotify={this.failedNotify} loadPersons={this.loadPersons} />
+                </div>
+                {/* Button trigger modal */}
+                <TableRow data={this.state.data} deletePerson={this.deletePersons} loading={this.state.loading} />
+
                 <div className="col-12">
                     {
                         this.state.page != null ? <Pagination page={this.state.page} loadPersons={this.loadPersons} search={this.searchInput.current} /> : <div></div>
@@ -214,18 +216,20 @@ const TableRow = (props) => {
         )
     }
     return (
-        <table className="table">
-            <thead className="thead-light">
-                <tr align="center">
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col" colSpan="2">Action</th>
-                </tr>
-            </thead>
-            <tbody className="h-100 ">
-                {tableHTML}
-            </tbody>
-        </table>
+        <div className="table-responsive">
+            <table className="table">
+                <thead className="thead-light">
+                    <tr align="center">
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col" colSpan="2">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="h-100 ">
+                    {tableHTML}
+                </tbody>
+            </table>
+        </div>
     )
 }

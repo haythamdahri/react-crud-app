@@ -51,6 +51,7 @@ export default function Person(props) {
                 <span class="sr-only">Loading...</span>
             </div>  Saving ...
         `
+        saveBtn.current.setAttribute("disabled", "disabled");
         fetch(`${API}/${id}`, {
             method: 'PUT', // *GET, POST, PUT, DELETE, etc.
             mode: 'cors', // no-cors, *cors, same-origin
@@ -71,6 +72,7 @@ export default function Person(props) {
             failedNotify();
             setEditMode(false);
         })
+        saveBtn.current.setAttribute("disabled", false);
     }
 
     if (editMode && person) {

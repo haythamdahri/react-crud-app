@@ -35,6 +35,7 @@ export default class Modals extends Component {
                     <span class="sr-only">Loading...</span>
                 </div>  Saving ...
             `;
+            this.saveBtn.current.setAttribute("disabled", "disabled");
             fetch(`${API}`, {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
@@ -50,6 +51,9 @@ export default class Modals extends Component {
             }).then((response) => response.json()).then((response) => {
                 this.props.successNotify(`${this.state.person.name} has been saved successfully!`);
                 this.props.loadPersons(0, null);
+                this.setState({
+                    person: new PersonModel(null, "", "")
+                })
                 this.toggle();
             }).catch((err) => {
                 this.props.failedNotify("An error occurred, please try again later!");
@@ -57,20 +61,17 @@ export default class Modals extends Component {
                     <FontAwesomeIcon icon={faSave} /> Save
                 `;
             })
+            this.saveBtn.current.setAttribute("disabled", false);
         } else {
-            if (this.state.person.name === "") {
-                $("#Name").addClass("is-invalid");
-            }
-            if (this.state.person.email === "") {
-                $("#Email").addClass("is-invalid");
-            }
+            $('#Name').attr('class', this.state.person.name === '' ? 'form-control is-invalid' : 'form-control is-valid');
+            $('#Email').attr('class', this.state.person.email === '' ? 'form-control is-invalid' : 'form-control is-valid');
         }
         return false
     }
 
     render() {
         return (
-            <div>
+            <div className="col-12">
                 <Button color="primary" onClick={this.toggle}><FontAwesomeIcon icon={faUserPlus} /> Add user</Button>
                 <Modal size="lg" aria-labelledby="example-modal-sizes-title-lg" isOpen={this.state.modal} toggle={this.toggle}>
                     <ModalHeader toggle={this.toggle}>Add a new user</ModalHeader>
