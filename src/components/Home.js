@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserMinus, faUserEdit, faExclamation, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faUserMinus, faUserEdit, faExclamation, faSearch, faCheckSquare, faWindowClose } from '@fortawesome/free-solid-svg-icons'
 import Modals from './Modals'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2'
 
 export default class Home extends React.Component {
 
@@ -63,28 +64,42 @@ export default class Home extends React.Component {
     }
 
     deletePersons = async (event) => {
-        event.target.innerHTML = `
-            <div class="spinner-border spinner-border-sm" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>  Deleting ...
-        `;
-        const personId = parseInt(event.target.attributes["data-val"].value);
-        const API = "http://192.168.1.6:8080/api/persons/";
-        const response = await fetch(`${API}/${personId}`, {
-            method: 'DELETE'
+        const target = event.target;
+        Swal.fire({
+            title: 'Are you sure to delete this user?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: `No, cancel!`,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: `Yes, delete it!`,
+        }).then(async (result) => {
+            if (result.value) {
+                target.innerHTML = `
+                    <div class="spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>  Deleting ...
+                `;
+                const personId = parseInt(target.attributes["data-val"].value);
+                const API = "http://192.168.1.6:8080/api/persons/";
+                const response = await fetch(`${API}/${personId}`, {
+                    method: 'DELETE'
+                });
+                if (response != null && response.status >= 200 && response.status < 300) {
+                    this.successNotify("Person has been deleted successfully");
+                    this.loadPersons(0, this.searchInput.current.value);
+                    this.setState({
+                        data: this.state.data.filter(person => person.id !== personId)
+                    });
+                } else {
+                    this.failedNotify("An error occurred, please retry again later!");
+                    target.innerHTML = `
+                        <FontAwesomeIcon icon={faUserMinus} /> Delete
+                    `
+                }
+            }
         });
-        if (response != null && response.status >= 200 && response.status < 300) {
-            this.successNotify("Person has been deleted successfully");
-            this.loadPersons(0, this.searchInput.current.value);
-            this.setState({
-                data: this.state.data.filter(person => person.id !== personId)
-            });
-        } else {
-            this.failedNotify("An error occurred, please retry again later!");
-            event.target.innerHTML = `
-                <FontAwesomeIcon icon={faUserMinus} /> Delete
-            `
-        }
     }
 
     handleFormSubmit = (event) => {

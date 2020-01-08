@@ -26,7 +26,7 @@ export default function Person(props) {
     document.title = "Person";
     const [person, setPerson] = useState(new PersonModel(null, "", ""))
     const [editMode, setEditMode] = useState(false);
-    const [saveBtn, setSaveBtn] = useState(React.createRef());
+    const [saveBtn] = useState(React.createRef());
 
     // Path params
     const { id } = props.match.params;
