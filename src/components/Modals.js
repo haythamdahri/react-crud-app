@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus, faWindowClose, faSave } from '@fortawesome/free-solid-svg-icons';
 import PersonModel from '../models/PersonModel';
 import $ from 'jquery';
+import appService from '../services/ApplicationService';
 
 export default class Modals extends Component {
 
@@ -28,7 +29,7 @@ export default class Modals extends Component {
     handleFormSubmit = (event) => {
         event.preventDefault();
         if (this.state.person.areFieldsNotEmpty() === true) {
-            const API = "http://192.168.1.6:8080/api/persons";
+            const API = `${appService.API}/persons`;
             // Set Loading on button
             this.saveBtn.current.innerHTML = `
                 <div class="spinner-border spinner-border-sm" role="status">

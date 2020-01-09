@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserEdit, faSave, faHome, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify';
 import { ToastContainer } from 'react-toastify';
+import appService from '../services/ApplicationService';
 
 export default function Person(props) {
 
@@ -30,7 +31,7 @@ export default function Person(props) {
 
     // Path params
     const { id } = props.match.params;
-    const API = "http://192.168.1.6:8080/api/persons";
+    const API = `${appService.API}/persons`;
 
 
     useEffect(() => {

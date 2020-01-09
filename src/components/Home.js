@@ -6,6 +6,7 @@ import Modals from './Modals'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2'
+import appService from '../services/ApplicationService';
 
 export default class Home extends React.Component {
 
@@ -44,7 +45,7 @@ export default class Home extends React.Component {
             loading: true,
             data: []
         })
-        const API = "http://192.168.1.6:8080/api/persons";
+        const API = `${appService.API}/persons`;
         const API_URL = (search !== null && search === "") || search == null ? `${API}?size=10&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
 
         fetch(API_URL).then((response) => response.json()).then((response) => {
@@ -82,7 +83,7 @@ export default class Home extends React.Component {
                     </div>  Deleting ...
                 `;
                 const personId = parseInt(target.attributes["data-val"].value);
-                const API = "http://192.168.1.6:8080/api/persons/";
+                const API = `${appService.API}/persons/`;
                 const response = await fetch(`${API}/${personId}`, {
                     method: 'DELETE'
                 });
