@@ -46,7 +46,7 @@ export default class Home extends React.Component {
             data: []
         })
         const API = `${appService.API}/persons`;
-        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=10&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
+        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=1000&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
 
         fetch(API_URL).then((response) => response.json()).then((response) => {
             this.setState({
@@ -143,7 +143,9 @@ export default class Home extends React.Component {
 const Pagination = (props) => {
     let pages = [];
     if (props.page.totalPages >= 5) {
-        for (let i = 0; i < props.page.totalPages - (props.page.totalPages - 5); i++) {
+        let startIndex = props.page.number < props.page.totalPages - 5 ? props.page.number : props.page.totalPages - 5;
+        let lastIndex = props.page.number < props.page.totalPages - 5 ? props.page.number + 5 : props.page.totalPages;
+        for (let i = startIndex; i < lastIndex; i++) {
             pages.push(i);
         }
     }
