@@ -46,7 +46,7 @@ export default class Home extends React.Component {
             data: []
         })
         const API = `${appService.API}/persons`;
-        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=1000&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
+        const API_URL = (search !== null && search === "") || search == null ? `${API}?size=50&page=${page}` : `${API}/search/by-name?name=${search.trim()}&size=10&page=${page}`;
 
         fetch(API_URL).then((response) => response.json()).then((response) => {
             this.setState({

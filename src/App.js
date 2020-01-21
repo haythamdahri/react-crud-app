@@ -43,7 +43,7 @@ function App() {
 
       <div className="container">
         <Route exact path="/" component={Home} />
-        <Route exact path="/persons/:id" component={Person} />
+        <Route path="/persons/:id" component={Person} />
         <Route path="/about" component={About} />
         <Route path="/topics" component={Topics} />
       </div>
