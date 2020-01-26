@@ -1,0 +1,27 @@
+import {SIGN_IN, SIGN_OUT, SIGN_UP} from '../constants';
+import firebase  from "../../configuration/FirebaseConfiguration";
+
+export const signInAction = ({ user }) => {
+    return {
+        type: SIGN_IN,
+        payload: firebase.auth().signInWithEmailAndPassword(user.email, user.password)
+    }
+};
+export const signUpAction = ({ user }) => {
+    return {
+        type: SIGN_UP,
+        payload: firebase.auth().createUserWithEmailAndPassword(user.email, user.password)
+    }
+};
+export const signOutAction = () => {
+    return {
+        type: SIGN_OUT,
+        payload: firebase.auth().signOut()
+    }
+};
+export const isLoggedAction = () => {
+    return {
+        type: SIGN_OUT,
+        payload: firebase.auth().currentUser
+    }
+};

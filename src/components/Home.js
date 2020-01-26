@@ -33,7 +33,6 @@ export default class Home extends React.Component {
     }
 
     componentDidMount() {
-        console.log("componentDidMount")
 
         // Load persons
         this.loadPersons(0);

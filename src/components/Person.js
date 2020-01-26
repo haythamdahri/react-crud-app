@@ -10,14 +10,12 @@ import appService from '../services/ApplicationService';
 export default function Person(props) {
 
     const successNotify = (message) => {
-
         toast.success(message, {
             position: toast.POSITION.TOP_RIGHT
         });
     }
 
     const failedNotify = (message) => {
-
         toast.error(message, {
             position: toast.POSITION.TOP_RIGHT
         });
